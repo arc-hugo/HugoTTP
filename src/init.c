@@ -2,25 +2,20 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
 
 #include "../include/init.h"
 
-// Default server port
-#define HUGOTTP_DEFAULT_PORT 8080
-// Default number of maximum pending connections accepted
-#define HUGOTTP_DEFAULT_PENDING 1000
-
-int accept_socket () {
+int request_socket () {
    // Instantiate the accept socket
-   int accept_sock;
-   if ((accept_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+   int req_sock;
+   if ((req_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
       perror("Error during socket creation");
-      return -1;
    }
-   return accept_sock;
+   return req_sock;
 }
 
-int accept_bind(int accept_sock, struct sockaddr_in * addr, socklen_t addr_len, int port) {
+int request_bind(int req_sock, struct sockaddr_in * addr, int port) {
    // Default or custom port
    if (port == 0)
       port = HUGOTTP_DEFAULT_PORT;
@@ -31,21 +26,30 @@ int accept_bind(int accept_sock, struct sockaddr_in * addr, socklen_t addr_len, 
    addr->sin_port = htons(HUGOTTP_DEFAULT_PORT);
 
    // Bind socket to address
-   if (bind(accept_sock, (struct sockaddr *) addr, sizeof(*addr)) ) {
+   if (bind(req_sock, (struct sockaddr *) addr, sizeof(*addr)) ) {
       perror("Error during socket bind");
       return -1;
    }
    return 0;
 }
 
-int accept_listen(int accept_sock, int max) {
-   // Default or custom max pending connection
+int request_listen(int req_sock, int max) {
+   // Default or custom max pending requests
    if (max == 0)
       max = HUGOTTP_DEFAULT_PENDING;
-   // Setup the listening socket 
-   if (listen(accept_sock, max) < 0) {
+   // Setup the listening socket
+   if (listen(req_sock, max) < 0) {
       perror("Error during listen");
       return -1;
    }
    return 0;
+}
+
+int accept_connection(int req_sock, struct sockaddr_in * addr) {
+   int resp_sock;
+   socklen_t addrlen = sizeof(*addr);
+   if ((resp_sock = accept(req_sock, (struct sockaddr*) addr, &addrlen)) < 0) {
+      perror("Error accepting connection");
+   }
+   return resp_sock;
 }
