@@ -4,7 +4,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#include "../include/init.h"
+#include <init.h>
 
 int request_socket () {
    // Instantiate the accept socket
