@@ -11,7 +11,7 @@
 #define HUGOTTP_DEFAULT_PENDING 1000
 
 int accept_socket () {
-   // Instantia the accept socket
+   // Instantiate the accept socket
    int accept_sock;
    if ((accept_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
       perror("Error during socket creation");
