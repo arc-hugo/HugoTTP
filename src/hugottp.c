@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 
 #include <init.h>
+#include <request.h>
 
 int main(int argc, char ** argv) {
    // Request and response socket
@@ -16,13 +17,15 @@ int main(int argc, char ** argv) {
    // Init the server
    if ((req_sock = request_socket()) < 0)
       return req_sock;
+   printf("[HUGOTTP] TCP socket created\n");
    if (request_bind(req_sock, &addr, 0) < 0)
       return -1;
+   printf("[HUGOTTP] Socket binded\n");
    if (request_listen(req_sock, 0) < 0)
       return -1;
 
    // Wait for incomming request
-   printf("[HUGOTTP] Ready for new connections :\n");
+   printf("[HUGOTTP] Ready\n");
    while (1) {
       if ((resp_sock = accept_connection(req_sock, &addr)) < 0)
          return resp_sock;
@@ -36,21 +39,20 @@ int main(int argc, char ** argv) {
             // Forked process
             // Closing request socket
             close(req_sock);
+
             // Request message buffer
             char * buffer = malloc(8000*sizeof(char));
-            // Read socket and display message
-            if (read(resp_sock, buffer, 8000) < 0) {
-               perror("Error reading request");
-               return -1;
-            }
-            printf("%s\n",buffer);
+            int size = receive_request(resp_sock, &buffer, 8000);
 
+            // Read socket and display message
+            handle_request(resp_sock, buffer, size);
+
+            close(resp_sock);
             break;
          default:
             // Parent process
             // Closing response socket
             close(resp_sock);
-
             break;
       }
    }
