@@ -1,14 +1,24 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <signal.h>
 #include <unistd.h>
 #include <netinet/in.h>
+
 
 #include <init.h>
 #include <request.h>
 
+int req_sock;
+
+void signal_hander(int sig) {
+   close(req_sock);
+}
+
 int main(int argc, char ** argv) {
+   // Handle signal SIGINT
+   signal(SIGINT, signal_hander);
    // Request and response socket
-   int req_sock, resp_sock;
+   int resp_sock;
    // Forked process PID
    int pid;
    // Internet server address
@@ -44,10 +54,11 @@ int main(int argc, char ** argv) {
             char * buffer = malloc(8000*sizeof(char));
             int size = receive_request(resp_sock, &buffer, 8000);
 
-            // Read socket and display message
+            // Handle request
             handle_request(resp_sock, buffer, size);
 
             close(resp_sock);
+            return 0;
             break;
          default:
             // Parent process
@@ -56,6 +67,6 @@ int main(int argc, char ** argv) {
             break;
       }
    }
-
+   close(req_sock);
    return 0;
 }
