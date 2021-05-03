@@ -5,7 +5,7 @@
 #include <netinet/in.h>
 
 // Default server port
-#define HUGOTTP_DEFAULT_PORT 8080
+#define HUGOTTP_DEFAULT_PORT 8008
 // Default number of maximum pending connections accepted
 #define HUGOTTP_DEFAULT_PENDING 1000
 

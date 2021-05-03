@@ -10,7 +10,7 @@ int request_socket () {
    // Instantiate the accept socket
    int req_sock;
    if ((req_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-      perror("Error during socket creation");
+      perror("[HUGOTTP] Error during socket creation");
    }
    return req_sock;
 }
@@ -27,7 +27,7 @@ int request_bind(int req_sock, struct sockaddr_in * addr, int port) {
 
    // Bind socket to address
    if (bind(req_sock, (struct sockaddr *) addr, sizeof(*addr)) ) {
-      perror("Error during socket bind");
+      perror("[HUGOTTP] Error during socket bind");
       return -1;
    }
    return 0;
@@ -39,7 +39,7 @@ int request_listen(int req_sock, int max) {
       max = HUGOTTP_DEFAULT_PENDING;
    // Setup the listening socket
    if (listen(req_sock, max) < 0) {
-      perror("Error during listen");
+      perror("[HUGOTTP] Error during listen");
       return -1;
    }
    return 0;
@@ -49,7 +49,7 @@ int accept_connection(int req_sock, struct sockaddr_in * addr) {
    int resp_sock;
    socklen_t addrlen = sizeof(*addr);
    if ((resp_sock = accept(req_sock, (struct sockaddr*) addr, &addrlen)) < 0) {
-      perror("Error accepting connection");
+      perror("[HUGOTTP] Error accepting connection");
    }
    return resp_sock;
 }
